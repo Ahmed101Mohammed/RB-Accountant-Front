@@ -6,6 +6,8 @@ import TableEntity from "../../TableEntity.jsx"
 import accountsServices from "../../../services/accounts.js"
 import SingleCardDataDisplay from "../../SingleCardDataDisplay.jsx"
 import transactionsServices from "../../../services/transactions.js"
+import Header from "../../Header/Header.jsx"
+import { File01Icon } from "hugeicons-react"
 const AccountStatementPage = () =>
 {
   const [accountName, setAccountName] = useState("")
@@ -14,6 +16,16 @@ const AccountStatementPage = () =>
   const accountId = useSelector(state => state.accountStatement.dataHeader.accountId)
   const startPeriod = useSelector(state => state.accountStatement.dataHeader.startPeriod)
   const endPeriod = useSelector(state => state.accountStatement.dataHeader.endPeriod)
+  const exportedData = {
+    accountStatement,
+    statementHeader: {
+      accountName,
+      accountId,
+      startPeriod,
+      endPeriod,
+      startPeriodBalance
+    }
+  }
 
   const hook = async() =>
   {
@@ -23,27 +35,33 @@ const AccountStatementPage = () =>
     if(accountDataResponse.state) setAccountName(accountDataResponse.data[0].name)
     if(balanceOfStartPeriodResponse.state) setStartPeriodBalance(balanceOfStartPeriodResponse.data[0].balance)
   }
-  
-  let style = {
-              marginTop: '86px'
-            }
+
   useEffect(()=>{hook()}, [accountId, startPeriod])
+
+  let headerChildren = (accountName && startPeriodBalance !== null)
+    ? [<button className='flex items-center gap-2 text-zinc-600 hover:text-zinc-900' onClick={()=>{
+              transactionsServices.exportExcel(exportedData)
+            }}><File01Icon size={34}/></button>]
+    : null;
   return (
     <>
-      <AccountStatementForm/>
+      <div className="sticky top-[0px]">
+        <Header children={headerChildren}/>
+        <AccountStatementForm legend={'كشف معاملات حساب'}/>
+      </div>
       {
         accountName && startPeriodBalance !== null
         ? <>
-            <SingleCardDataDisplay style={style} data={
+            <SingleCardDataDisplay data={
                 {
                   'كود الحساب': accountId,
                   'اسم الحساب': accountName,
                   'بداية الفترة': startPeriod,
-                  'نهاية الفترة': endPeriod,
-                  'رصيد بداية الفتر': startPeriodBalance
+                  'نهاية الفترة': endPeriod
                 }
               }/>
-              <TableView pt={'0px'} ml={'286px'} heads={['كود', 'الرصيد', 'مدين', 'دائن', 'بيان', 'تاريخ']} >
+              <TableView heads={['كود', 'الرصيد', 'مدين', 'دائن', 'بيان', 'تاريخ']} >
+                <TableEntity key={'-'} data={['', startPeriodBalance, '', '', 'رصيد بداية الفترة', '']}/>
                 {
                   accountStatement.map(({transaction_id, balance, amount, state, comment, date}) =>
                   {
@@ -56,6 +74,10 @@ const AccountStatementPage = () =>
                   )
                 }
               </TableView>
+              {/* <button onClick={()=>{
+                transactionsServices.exportPDF(accountStatement)
+              }}>export PDF</button> */}
+              
             </>
         : null
       }

@@ -16,12 +16,6 @@ const transactionsReducer = createSlice({
       commentField: "",
       transactionId: undefined,
       dateField: currentDate(),
-    },
-    accountTransactionsFilter: {
-      state: false,
-      accountId: '',
-      startPeriod: '',
-      endPeriod: ''
     }
   },
   reducers: {
@@ -40,7 +34,6 @@ const transactionsReducer = createSlice({
       const newState = {
         transactionsData: newTransactions,
         transactionsForm: {...state.transactionsForm},
-        accountTransactionsFilter: {...state.accountTransactionsFilter}
       }
       return newState
     },
@@ -51,11 +44,10 @@ const transactionsReducer = createSlice({
       const newTransaction = action.payload
       let newTransactions = [...state.transactionsData]
       if(!newTransactionsData[newTransaction.id]) newTransactions = [newTransaction, ...newTransactions]
-         newTransactions = newTransactions.sort((a, b) => a.date < b.date ? 1 : a.date === b.date? a.id < b.id? 1 : -1 : -1)
+         newTransactions = newTransactions.sort((a, b) => a.date > b.date ? 1 : a.date === b.date? a.id > b.id? 1 : -1 : -1)
       const newState = {
         transactionsData: newTransactions,
-        transactionsForm: {...state.transactionsForm},
-        accountTransactionsFilter: {...state.accountTransactionsFilter}
+        transactionsForm: {...state.transactionsForm}
       }
       return newState
     },
@@ -72,8 +64,7 @@ const transactionsReducer = createSlice({
         }
       const newState = {
         transactionsData: newTransactions,
-        transactionsForm: {...state.transactionsForm},
-        accountTransactionsFilter: {...state.accountTransactionsFilter}
+        transactionsForm: {...state.transactionsForm}
       }
       return newState
     },
@@ -83,8 +74,7 @@ const transactionsReducer = createSlice({
         transactionsData: [...state.transactionsData],
         transactionsForm: { ...state.transactionsForm,
           state: !state.transactionsForm.state,
-        },
-        accountTransactionsFilter: {...state.accountTransactionsFilter}
+        }
       }
       return newState
     },
@@ -95,8 +85,7 @@ const transactionsReducer = createSlice({
         transactionsData: [...state.transactionsData],
         transactionsForm: { ...state.transactionsForm,
           amountField: action.payload
-        },
-        accountTransactionsFilter: {...state.accountTransactionsFilter}
+        }
       }
       return newState
     },
@@ -106,8 +95,7 @@ const transactionsReducer = createSlice({
         transactionsData: [...state.transactionsData],
         transactionsForm: {...state.transactionsForm,
           debtorIdField: action.payload
-        },
-        accountTransactionsFilter: {...state.accountTransactionsFilter}
+        }
       }
       return newState
     },
@@ -117,8 +105,7 @@ const transactionsReducer = createSlice({
         transactionsData: [...state.transactionsData],
         transactionsForm: {...state.transactionsForm,
           creditorIdField: action.payload
-        },
-        accountTransactionsFilter: {...state.accountTransactionsFilter}
+        }
       }
       return newState
     },
@@ -128,8 +115,7 @@ const transactionsReducer = createSlice({
         transactionsData: [...state.transactionsData],
         transactionsForm: {...state.transactionsForm,
           commentField: action.payload
-        },
-        accountTransactionsFilter: {...state.accountTransactionsFilter}
+        }
       }
       return newState
     },
@@ -139,8 +125,7 @@ const transactionsReducer = createSlice({
         transactionsData: [...state.transactionsData],
         transactionsForm: {...state.transactionsForm,
           dateField: action.payload
-        },
-        accountTransactionsFilter: {...state.accountTransactionsFilter}
+        }
       }
       return newState
     },
@@ -151,8 +136,7 @@ const transactionsReducer = createSlice({
         transactionsData: [...state.transactionsData],
         transactionsForm: {...state.transactionsForm,
           dateField: currentDate()
-        },
-        accountTransactionsFilter: {...state.accountTransactionsFilter}
+        }
       }
       return newState
     },
@@ -162,56 +146,10 @@ const transactionsReducer = createSlice({
         transactionsData: [...state.transactionsData],
         transactionsForm: {...state.transactionsForm,
           transactionId: action.payload
-        },
-        accountTransactionsFilter: {...state.accountTransactionsFilter}
-      }
-      return newState
-    },
-    toggleAccountTransactionsFilterState(state, action)
-    {
-      const newState = {
-        transactionsData: [...state.transactionsData],
-        transactionsForm: {...state.transactionsForm},
-        accountTransactionsFilter: {...state.accountTransactionsFilter,
-          state: !state.accountTransactionsFilter.state
         }
       }
       return newState
-    },
-    setAccountTransactionsFilterAccountId(state, action)
-    {
-      const newState = {
-        transactionsData: [...state.transactionsData],
-        transactionsForm: {...state.transactionsForm},
-        accountTransactionsFilter: {...state.accountTransactionsFilter,
-          accountId: action.payload
-        }
-      }
-      return newState
-    },
-    setAccountTransactionsFilterStartPeriod(state, action)
-    {
-      const newState = {
-        transactionsData: [...state.transactionsData],
-        transactionsForm: {...state.transactionsForm},
-        accountTransactionsFilter: {...state.accountTransactionsFilter,
-          startPeriod: action.payload
-        }
-      }
-      return newState
-    },
-    setAccountTransactionsFilterEndPeriod(state, action)
-    {
-      const newState = {
-        transactionsData: [...state.transactionsData],
-        transactionsForm: {...state.transactionsForm},
-        accountTransactionsFilter: {...state.accountTransactionsFilter,
-          endPeriod: action.payload
-        }
-      }
-      return newState
-    },
-    
+    }    
   }
 })
 
@@ -228,10 +166,6 @@ export const {
   reSetAccontsListOptions,
   reSetTransactionsFormDateField,
   setTransactionsFormTransactionId,
-  toggleAccountTransactionsFilterState,
-  setAccountTransactionsFilterAccountId,
-  setAccountTransactionsFilterStartPeriod,
-  setAccountTransactionsFilterEndPeriod,
   removeTransaction
 } = transactionsReducer.actions
 export default transactionsReducer.reducer

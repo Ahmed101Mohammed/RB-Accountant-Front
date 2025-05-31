@@ -5,8 +5,11 @@ import accountsServices from "../../../services/accounts.js";
 import transactionsServices from "../../../services/transactions.js";
 import { setAccountId, setData, setEndPeriod, setStartPeriod } from "../../../reducers/accountStatement.js";
 import { removeNotification, setErrorNotification } from "../../../reducers/notification.js";
+import Form from "../../Form.jsx";
 const AccountStatementForm = ({ legend }) => {
   const [accountId, setAccountIdLocal] = useState("")
+  const [firstPeriod, setFirstPeriod] = useState("")
+  const [lastPeriod, setLastPeriod] = useState("")
   const [ posibleAccounts, setPosibleAccounts] = useState([])
   const wrapperRef = useRef(null)
   const dispatch = useDispatch()
@@ -55,6 +58,19 @@ const AccountStatementForm = ({ legend }) => {
   {
     setAccountIdLocal(e.target.value)
     const response = await accountsServices.getPossibleUsers(e.target.value)
+    const firstTransactionDateResponse = await transactionsServices.getFirstTransactionDateOfAccount(e.target.value)
+    const lastTransactionDateResponse = await transactionsServices.getLastTransactionDateOfAccount(e.target.value)
+    if(firstTransactionDateResponse.state && lastTransactionDateResponse.state)
+    {
+      setFirstPeriod(firstTransactionDateResponse.data[0].date)
+      setLastPeriod(lastTransactionDateResponse.data[0].date)
+    }
+    else
+    {
+      setFirstPeriod("")
+      setLastPeriod("")
+    }
+    
     if(response.state)
     {
       setPosibleAccounts(response.data)
@@ -66,30 +82,39 @@ const AccountStatementForm = ({ legend }) => {
   }
 
   return (
-    <div className="fixed left-0 top-[86px] max-h-[calc(100%-86px)] max-w-1/5 p-4 bg-gray-100 shadow-lg overflow-auto">
-      <fieldset className="border border-gray-300 p-4 rounded-lg">
-        <legend className="text-lg font-semibold">{legend}</legend>
-        <form className="flex flex-col gap-4 mt-4" onSubmit={submitHandler}>
-          <Input name={'account-id'} label={'كود الحساب'} ref={wrapperRef}
-                type={'text'} placeholder={'أدخل كود الحساب مثل: 0000'} 
-                onChange={accountIdOnChange} value={accountId} 
-                onSelect={(value)=> {
-                  setAccountIdLocal(value)
-                  setPosibleAccounts([])
-                  }} listValues={posibleAccounts}/>
-          <Input name={'date1'} label={'بداية الفترة'} 
-                type={'date'} disabled={accountId === ""} />
-          <Input name={'date2'} label={'نهاية الفترة'} 
-                type={'date'} disabled={accountId === ""}/>
-            
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
-              كشف معاملات الحساب
-          </button>
-
-        </form>
-      </fieldset>
-    </div>
-  );
+    <Form legend={legend} submitHandler={submitHandler}>
+      <Input name={'account-id'} label={'كود الحساب'} ref={wrapperRef}
+            type={'text'} placeholder={'أدخل كود الحساب مثل: 0000'} 
+            onChange={accountIdOnChange} value={accountId} 
+            onSelect={async(value)=> {
+              console.log({value})
+              setAccountIdLocal(value)
+              setPosibleAccounts([])
+              const firstTransactionDateResponse = await transactionsServices.getFirstTransactionDateOfAccount(value)
+              const lastTransactionDateResponse = await transactionsServices.getLastTransactionDateOfAccount(value)
+              if(firstTransactionDateResponse.state && lastTransactionDateResponse.state)
+              {
+                setFirstPeriod(firstTransactionDateResponse.data[0].date)
+                setLastPeriod(lastTransactionDateResponse.data[0].date)
+              }
+              else
+              {
+                setFirstPeriod("")
+                setLastPeriod("")
+              }
+            }} listValues={posibleAccounts}/>
+      <Input name={'date1'} label={'بداية الفترة'} 
+            type={'date'} disabled={accountId === ""} 
+            value={firstPeriod} onChange={(e)=>setFirstPeriod(e.value)}/>
+      <Input name={'date2'} label={'نهاية الفترة'} 
+            type={'date'} disabled={accountId === ""}
+            value={lastPeriod} onChange={(e)=>setLastPeriod(e.value)}/>
+        
+      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+          كشف معاملات الحساب
+      </button>
+    </Form>
+  )
 };
 
 export default AccountStatementForm;

@@ -6,6 +6,7 @@ import accountsServices from "../../services/accounts.js"
 
 import { useDispatch, useSelector } from "react-redux"
 import { setAccounts, setAccountsFormIdField, setAccountsFormNameField, toggleAccountFormState } from "../../reducers/accounts.js"
+import Header from "../Header/Header.jsx"
 
 const AccountsPage = ()=>
 {
@@ -35,10 +36,14 @@ const AccountsPage = ()=>
     if(!formState) return
     dispatch(toggleAccountFormState())
   }
+
   return(
     <>
-      <ManageAccountsForm legend={'إنشاء/تعديل حساب'} />
-      <TableView heads={["كود", "الحساب"]} pt={'86px'} ml={'284px'} onClick={onClickEntity}>
+      <div className="sticky top-[0px]">
+        <Header/>
+        <ManageAccountsForm legend={'إنشاء/تعديل حساب'} />
+      </div>
+      <TableView heads={["كود", "الحساب"]} onClick={onClickEntity}>
         {
           accounts.map(account => {
             let data = {

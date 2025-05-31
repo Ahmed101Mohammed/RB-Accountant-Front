@@ -1,23 +1,19 @@
 import React from "react";
 import Details from "./Details.jsx";
-const Input = ({ type, name, label, step, placeholder, onChange, value, disabled, listValues, onSelect, ref }) => {
+const Textarea = ({ name, label, placeholder, onChange, value, disabled, listValues, onSelect, ref, style }) => {
   return (
     <div className="relative flex flex-col" ref={ref}>
       <label htmlFor={name} className="font-normal text-right">{label}</label>
-      <input
+      <textarea
         dir="rtl"
-        type={type}
         name={name}
         id={name}
         placeholder={placeholder}
-        className="border border-gray-300 p-1 rounded-lg focus:outline-none focus:ring-1 text-right focus:ring-blue-500"
+        className="max-h-10 border border-gray-300 p-1 rounded-lg focus:outline-none focus:ring-1 text-right focus:ring-blue-500"
         onChange={onChange}
         value={value}
         disabled={disabled}
-        step={step
-          ? step
-          : "1"
-        }
+        style={style}
       />
 
       {
@@ -29,4 +25,4 @@ const Input = ({ type, name, label, step, placeholder, onChange, value, disabled
   );
 };
 
-export default Input
+export default Textarea

@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import Details from "./Details.jsx";
-const Input = ({ type, name, label, step, placeholder, onChange, value, disabled, listValues, onSelect, ref }) => {
+const InputNoLabel = ({ type, name, step, placeholder, onChange, value, disabled, listValues, onSelect, ref }) => {
+  const [isVisible, setVisibility] = useState(true)
+
   return (
     <div className="relative flex flex-col" ref={ref}>
-      <label htmlFor={name} className="font-normal text-right">{label}</label>
       <input
         dir="rtl"
         type={type}
@@ -18,15 +19,16 @@ const Input = ({ type, name, label, step, placeholder, onChange, value, disabled
           ? step
           : "1"
         }
+        min="0"
       />
 
       {
-        listValues && listValues.length
-        ? <Details listValues={listValues} onSelect={onSelect} />
+        listValues && listValues.length && isVisible
+        ? <Details listValues={listValues} onSelect={onSelect} style={{marginTop: '0px', zIndex: '10'}}/>
         : null
       }
     </div>
   );
 };
 
-export default Input
+export default InputNoLabel
