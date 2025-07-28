@@ -12,20 +12,18 @@ const AccountStatementPage = () =>
 {
   const [accountName, setAccountName] = useState("")
   const [startPeriodBalance, setStartPeriodBalance] = useState(null)
-  const accountStatement = useSelector(state => state.accountStatement.data)
-  const accountId = useSelector(state => state.accountStatement.dataHeader.accountId)
-  const startPeriod = useSelector(state => state.accountStatement.dataHeader.startPeriod)
-  const endPeriod = useSelector(state => state.accountStatement.dataHeader.endPeriod)
-  const exportedData = {
-    accountStatement,
-    statementHeader: {
-      accountName,
-      accountId,
-      startPeriod,
-      endPeriod,
-      startPeriodBalance
-    }
-  }
+  const { accountId, startPeriod, endPeriod } = useSelector(state => state.accountStatementForm);
+  const accountStatement = useSelector(state => state.accountStatement);
+  // const exportedData = {
+  //   accountStatement,
+  //   statementHeader: {
+  //     accountName,
+  //     accountId,
+  //     startPeriod,
+  //     endPeriod,
+  //     startPeriodBalance
+  //   }
+  // }
 
   const hook = async() =>
   {
@@ -37,20 +35,19 @@ const AccountStatementPage = () =>
   }
 
   useEffect(()=>{hook()}, [accountId, startPeriod])
-
-  let headerChildren = (accountName && startPeriodBalance !== null)
-    ? [<button className='flex items-center gap-2 text-zinc-600 hover:text-zinc-900' onClick={()=>{
-              transactionsServices.exportExcel(exportedData)
-            }}><File01Icon size={34}/></button>]
-    : null;
+  // let headerChildren = (accountName && startPeriodBalance !== null)
+  //   ? [<button className='flex items-center gap-2 text-zinc-600 hover:text-zinc-900' onClick={()=>{
+  //             transactionsServices.exportExcel(exportedData)
+  //           }}><File01Icon size={34}/></button>]
+  //   : null;
   return (
     <>
       <div className="sticky top-[0px]">
-        <Header children={headerChildren}/>
+        <Header /*children={headerChildren}*//>
         <AccountStatementForm legend={'كشف معاملات حساب'}/>
       </div>
       {
-        accountName && startPeriodBalance !== null
+        accountId && accountName && startPeriodBalance !== null
         ? <>
             <SingleCardDataDisplay data={
                 {
@@ -63,12 +60,12 @@ const AccountStatementPage = () =>
               <TableView heads={['كود', 'الرصيد', 'مدين', 'دائن', 'بيان', 'تاريخ']} >
                 <TableEntity key={'-'} data={['', startPeriodBalance, '', '', 'رصيد بداية الفترة', '']}/>
                 {
-                  accountStatement.map(({transaction_id, balance, amount, state, comment, date}) =>
+                  accountStatement.map(({transaction_id, balance, amount, role, comment, date}) =>
                   {
-                    let customTailwind = state
+                    let customTailwind = role === 0
                     ? 'bg-teal-50 hover:bg-teal-100'
                     : 'bg-red-50 hover:bg-red-100'
-                    if(state) return <TableEntity key={transaction_id} data={[transaction_id, balance, amount, "", comment, date]} customTailwind={customTailwind}/>
+                    if(role === 0) return <TableEntity key={transaction_id} data={[transaction_id, balance, amount, "", comment, date]} customTailwind={customTailwind}/>
                     return <TableEntity key={transaction_id} data={[transaction_id, balance, "", amount, comment, date]} customTailwind={customTailwind}/>
                   }
                   )

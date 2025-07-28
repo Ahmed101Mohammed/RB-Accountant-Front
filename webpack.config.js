@@ -1,10 +1,8 @@
 const path = require('node:path')
 const webpack = require('webpack')
+// const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const config = (env, argv) => {
-  const backendBaseUrl =
-    argv.mode === 'production' ? '' : 'http://localhost:4300'
-
   return {
     entry: path.resolve(__dirname, 'src', 'index.jsx'),
     output: {
@@ -67,12 +65,6 @@ const config = (env, argv) => {
         },
       ],
     },
-    plugins: [
-      new webpack.DefinePlugin({
-        NODE_ENV: JSON.stringify(argv.mode),
-        BACKEND_BASE_URL: JSON.stringify(backendBaseUrl),
-      }),
-    ],
   }
 }
 module.exports = config

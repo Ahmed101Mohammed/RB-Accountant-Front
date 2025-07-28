@@ -1,6 +1,6 @@
 import React from "react";
 import Details from "./Details.jsx";
-const Input = ({ type, name, label, step, placeholder, onChange, value, disabled, listValues, onSelect, ref }) => {
+export const Input = ({ type, name, label, step, placeholder, onChange, value, disabled, listValues, onSelect, ref }) => {
   return (
     <div className="relative flex flex-col" ref={ref}>
       <label htmlFor={name} className="font-normal text-right">{label}</label>
@@ -28,5 +28,3 @@ const Input = ({ type, name, label, step, placeholder, onChange, value, disabled
     </div>
   );
 };
-
-export default Input

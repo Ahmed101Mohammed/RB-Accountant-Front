@@ -1,11 +1,11 @@
 {
-  "name": "book-ecommerce-app-frontend",
-  "version": "1.0.0",
-  "description": "Frontend part of E-commerce app for books",
+  "name": "rb-accountant",
+  "version": "2.0.0",
+  "description": "Frontend part of rb-accountant descktop application",
   "main": "index.js",
   "scripts": {
     "test": "vitest run",
-    "build": "powershell -File ./build_script.ps1",
+    "build": "npx webpack --mode production",
     "dev": "nodemon --watch webpack.config.js --exec npx webpack serve --mode=development",
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
@@ -13,24 +13,25 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ahmed101Mohammed/book-ecommerce-app-frontend.git"
+    "url": "git+https://github.com/Ahmed101Mohammed/RB-Accountant-Front.git"
   },
   "keywords": [
-    "frontend-ecommerce",
-    "ecommerce-books",
-    "ecommerec",
-    "E-commerce"
+    "frontend-descktop",
+    "accountant",
+    "accountant-app"
   ],
   "author": "Ahmed Mohamed Al-Adl",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Ahmed101Mohammed/book-ecommerce-app-frontend/issues"
+    "url": "https://github.com/Ahmed101Mohammed/RB-Accountant-Front/issues"
   },
-  "homepage": "https://github.com/Ahmed101Mohammed/book-ecommerce-app-frontend#readme",
+  "homepage": "https://github.com/Ahmed101Mohammed/RB-Accountant-Front#readme",
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.0",
+    "html-webpack-plugin": "^5.6.3",
     "hugeicons-react": "^0.3.0",
     "joi": "^17.13.3",
+    "lucide-react": "^0.525.0",
     "promise-polyfill": "8.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

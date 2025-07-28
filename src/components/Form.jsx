@@ -1,6 +1,8 @@
 import React, { Children, useState } from "react";
 import { Cancel01Icon } from "hugeicons-react";
 import { ArrowDownDoubleIcon } from "hugeicons-react";
+import { Input } from "./Input.jsx";
+import Textarea from "./Textarea.jsx";
 const Form = ({ legend, submitHandler, children }) => {
   let [visibale, setVisibility] = useState(true)
   
@@ -29,7 +31,7 @@ const Form = ({ legend, submitHandler, children }) => {
     let inputs = []
     for(let child of children)
     {
-      if(child && child.type && child.type.name === 'Input') inputs.push(child)
+      if(child && child.type && child.type === Input) inputs.push(child)
     }
     return inputs
   }
@@ -39,7 +41,7 @@ const Form = ({ legend, submitHandler, children }) => {
     let inputs = []
     for(let child of children)
     {
-      if(child && child.type && child.type.name === 'Textarea') inputs.push(child)
+      if(child && child.type && child.type === Textarea) inputs.push(child)
     }
     return inputs
   }

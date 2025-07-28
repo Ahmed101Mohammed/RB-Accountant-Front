@@ -8,6 +8,11 @@ import Notification from './components/Notification/Notification.jsx'
 import TransactionsPage from './components/TransactionsPage/TransactionsPage.jsx'
 import DailyTransactionsPage from './components/TransactionsPage/DailyTransactionsPage/DailyTransactionsPage.jsx'
 import AccountStatementPage from './components/TransactionsPage/AccountStatementPage/AccountStatementPage.jsx'
+import { ConfirmMessage } from './components/ConfirmMessage.jsx'
+import EmployeesPage from './components/EmployeesPage/EmployeesPage.jsx'
+import { MachinesPage } from './features/machines/components/MachinesPage.jsx'
+import { ItemsPage } from './features/items/components/ItemsPage.jsx'
+import { DailyProductionPage } from './features/dailyProduction/components/DailyProductionPage.jsx'
 const App = () => {
  
   return (
@@ -15,11 +20,16 @@ const App = () => {
       <Routes>
         <Route path='/' element={<Home/>}/>
         <Route path='/accounts' element={<AccountsPage/>}/>
+        <Route path='/employees' element={<EmployeesPage/>}/>
+        <Route path='/machines' element={<MachinesPage/>}/>
+        <Route path='/items' element={<ItemsPage/>}/>
         <Route path='/transactions' element={<TransactionsPage/>}>
         </Route>
         <Route path='/daily_transactions' element={<DailyTransactionsPage/>}/>
         <Route path='/discover_account_transactions' element={<AccountStatementPage/>}/>
+        <Route path='/dailyProduction' element={<DailyProductionPage/>}/>
       </Routes>
+      <ConfirmMessage/>
       <Notification/>
     </>
   )

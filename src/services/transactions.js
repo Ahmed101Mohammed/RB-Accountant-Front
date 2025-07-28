@@ -58,9 +58,15 @@ const getLastTransactionDateOfAccount = async(accountId) =>
   return response
 }
 
-const createTransaction = async(amount, debtorId, creditorId, comment, date) =>
+const getAccountTransactionsCount = async(accountId) =>
 {
-  const response = await window.apis.createTransaction(amount, debtorId, creditorId, comment, date)
+  const response = await window.apis.getAccountTransactionsCount(accountId);
+  return response;
+}
+
+const createTransaction = async(transactionData) =>
+{
+  const response = await window.apis.createTransaction(transactionData)
   return response
 }
 
@@ -69,9 +75,10 @@ const deleteTransaction = async(id) =>
   const response = await window.apis.deleteTransaction(id)
   return response
 }
-const updateTransaction = async(id, amount, debtorId, creditorId, comment, date) =>
+
+const updateTransaction = async(id, transactionData) =>
 {
-  const response = await window.apis.updateTransaction(id, amount, debtorId, creditorId, comment, date)
+  const response = await window.apis.updateTransaction(id, transactionData)
   return response
 }
 
@@ -103,6 +110,7 @@ const transactionsServices = {
   getAcccountStatementForSpecificPeriod,
   getFirstTransactionDateOfAccount,
   getLastTransactionDateOfAccount,
+  getAccountTransactionsCount,
   exportPDF,
   exportExcel
 }

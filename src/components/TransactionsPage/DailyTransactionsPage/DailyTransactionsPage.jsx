@@ -5,19 +5,27 @@ import { useDispatch, useSelector } from "react-redux"
 import ManageTransactionsForm from "./ManageTransactionsForm.jsx"
 import transactionsServices from "../../../services/transactions.js"
 import Header from '../../Header/Header.jsx'
-import { setTransactions, setTransactionsFormAmountField, settransactionsFormCommentField, settransactionsFormCreditorIdField, settransactionsFormDateField, settransactionsFormDebtorIdField, setTransactionsFormTransactionId, toggleTransactionsFormState } from "../../../reducers/transactions.js"
+import { setTransactions } from "../../../reducers/transactions.js"
+import { setComment, setDate, setParticipants, setTransactionId, setState } from "../../../reducers/transactionForm.js";
 const DailyTransactionsPage = ()=>
 {
   const dispatch = useDispatch()
-  const transactions = useSelector(state => state.transactions.transactionsData)
-  let formState = useSelector(state => state.transactions.transactionsForm.state)
-
+  const transactions = useSelector(state => state.transactions)
+  const bottomRef = useRef(null);
+  const formRef = useRef(null);
   const getAllTransactions = async()=>
   {
     const transactionsResponse = await transactionsServices.getAllTransactions()
-    if(transactionsResponse.state) dispatch(setTransactions([...transactions, ...transactionsResponse.data]))
+    if(transactionsResponse.state) dispatch(setTransactions(transactionsResponse.data))
   }
   
+  useEffect(()=>
+  {
+    if(bottomRef.current)
+    {
+      bottomRef.current.scrollIntoView({behavior: 'smooth'});
+    }
+  }, [transactions])
   useEffect(()=>
   {
     getAllTransactions()
@@ -28,52 +36,49 @@ const DailyTransactionsPage = ()=>
     const tr = e.target.closest("tr")
     if(!tr) return
     const transactionId = tr.getAttribute('data-id')
-    const amount = tr.getAttribute('data-amount')
-    const debtorId = tr.getAttribute('data-debtor-id')
-    const creditorId = tr.getAttribute('data-creditor-id')
     const comment = tr.getAttribute('data-comment')
     const date = tr.getAttribute('data-date')
-    
-    dispatch(setTransactionsFormAmountField(amount))
-    dispatch(settransactionsFormDebtorIdField(debtorId))
-    dispatch(settransactionsFormCreditorIdField(creditorId))
-    dispatch(settransactionsFormCommentField(comment))
-    dispatch(settransactionsFormDateField(date))
-    dispatch(setTransactionsFormTransactionId(transactionId))
-    if(!formState) return
-    dispatch(toggleTransactionsFormState())
+    const participants = JSON.parse(tr.getAttribute('data-participants'));
+    const lightParticipants = participants.map(participant => { return {id: participant.account.id, amount: participant.body.amount, role: participant.body.role} });
+    dispatch(setDate(date));
+    dispatch(setComment(comment));
+    dispatch(setParticipants(lightParticipants));
+    dispatch(setTransactionId(transactionId));
+    dispatch(setState(false))
   }
   return(
     <>
       <div className="sticky top-[0px]">
         <Header/>
-        <ManageTransactionsForm legend={'إنشاء/تعديل معاملة'} />
+        <ManageTransactionsForm ref={formRef} legend={'إنشاء/تعديل معاملة'} />
       </div>
       <TableView heads={["كود المعاملة", "مدين", "دائن", "كود الحساب", "اسم الحساب", "بيان", "تاريخ"]} 
       style={null} onClick={onClickEntity}>
         {
-          transactions.map(({id, date, comment, participants}) =>
+          transactions.map(({id, body}) =>
           {
+            const metaData = body.metaData;
+            const participants = body.participants;
             const dataHeader = {
               'data-id': id,
-              'data-comment': comment,
-              'data-date': date,
+              'data-comment': metaData.comment,
+              'data-date': metaData.date,
               'data-participants': JSON.stringify(participants)
             }
             return (
               <React.Fragment key={id}>
                 {
-                  participants.map(({dbRecordId, amount, state, account}) =>
+                  participants.map(({dbRecordId, body, account}) =>
                   {
-                    if(!state) return (
+                    if(body.role === 0) return (
                       <TableEntity key={`${dbRecordId}`} dataHeader={dataHeader}
-                      data={[id, `E\u00A3 ${amount}`, "", account.id, account.name, comment, date]}  
+                      data={[id, `E\u00A3 ${body.amount}`, "", account.id, account.name, metaData.comment, metaData.date]}  
                       customTailwind={'bg-teal-50 hover:bg-teal-100'}/>
                     )
 
                     return (
                       <TableEntity key={`${dbRecordId}`} dataHeader={dataHeader}
-                      data={[id, "", `E\u00A3 ${amount}`, account.id, account.name, comment, date]} 
+                      data={[id, "", `E\u00A3 ${body.amount}`, account.id, account.name, metaData.comment, metaData.date]} 
                       customTailwind={'bg-red-50 hover:bg-red-100'}/>
                     )
                   })
@@ -83,6 +88,7 @@ const DailyTransactionsPage = ()=>
           })
         }      
       </TableView>
+      <span ref={bottomRef}></span>
     </>
   )
 }

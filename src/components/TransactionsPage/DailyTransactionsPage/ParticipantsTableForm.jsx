@@ -4,31 +4,33 @@ import SelectNoLabel from "../../SelectNoLabel.jsx";
 import { PlusSignCircleIcon } from "hugeicons-react";
 import { Delete01Icon } from "hugeicons-react";
 import accountsServices from "../../../services/accounts.js";
+import { useDispatch, useSelector } from "react-redux";
+import { setParticipants } from "../../../reducers/transactionForm.js";
 const ParticipantsTableForm = () => {
-  const [rows, setRows] = useState([
-    { amount: "", code: "", role: "" },
-    { amount: "", code: "", role: "" },
-  ]);
-  const [codeRowIndex, setCodeRowIndex] = useState(-1)
+  const dispatch = useDispatch();
+  const participants = useSelector((state) => state.transactionForm.participants);
+
+  const [idRowIndex, setIdRowIndex] = useState(-1)
   const addRow = (e) => {
-    e.preventDefault()
-    setRows([...rows, { amount: "", code: "", role: "" }]);
+    e.preventDefault();
+    dispatch(setParticipants([...participants, { amount: "", id: "", role: "0" }]));
   };
 
   const deleteRow = (e, index) =>
   {
-    e.preventDefault()
-    const filteredRows = rows.filter((row, index_) => index !== index_)
-    setRows(filteredRows)
+    e.preventDefault();
+    const filteredRows = participants.filter((row, index_) => index !== index_);
+    dispatch(setParticipants(filteredRows));
   }
+
   const clickHandler = (e)=>
   {
     e.preventDefault()
     const target = e.target;
-    const inputCode = target.closest('#account-code-input')
-    if(!inputCode)
+    const inputId = target.closest('#account-id-input')
+    if(!inputId)
     {
-      setCodeRowIndex(-1)
+      setIdRowIndex(-1)
     }
   }
 
@@ -36,7 +38,7 @@ const ParticipantsTableForm = () => {
   const [posibleAccounts, setPosibleAccounts] = useState([])
   const accountIdOnChange = async(index, fieldName, e)=>
   {
-    setCodeRowIndex(index)
+    setIdRowIndex(index)
     handleChange(index, fieldName, e.target.value)
     const response = await accountsServices.getPossibleUsers(e.target.value)
     if(response.state)
@@ -51,14 +53,14 @@ const ParticipantsTableForm = () => {
 
   const handleChange = (index, fieldName, value)=>
   {
-    let copyState = [...rows];
-    copyState[index][fieldName] = value
-    setRows(copyState)
+    let copyState = participants.map(participant => { return {...participant} });
+    copyState[index][fieldName] = value;
+    dispatch(setParticipants(copyState));
   }
 
   return (
     <div className="col-span-2">
-      <div className="overflow-x-auto max-h-[250px]" dir="ltr">
+      <div className="overflow-x-auto max-h-[150px]" dir="ltr">
         <table onClick={clickHandler} className="w-full border-collapse border border-gray-300 bg-gray-50" dir="rtl">
           <thead className="sticky top-0 z-20 bg-gray-300">
             <tr>
@@ -69,7 +71,7 @@ const ParticipantsTableForm = () => {
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, index) => (
+            {participants.map((row, index) => (
               <tr key={index}>
                 <td className="border border-gray-300 p-2">
                   <InputNoLabel
@@ -78,20 +80,20 @@ const ParticipantsTableForm = () => {
                     onChange={(e) => handleChange(index, "amount", e.target.value)}
                     placeholder="أدخل المبلغ"
                     step={'.01'}
-                    value={rows[index].amount}   
+                    value={participants[index].amount}   
                   />
                 </td>
-                <td id="account-code" className="border border-gray-300 p-2">
+                <td id="account-id" className="border border-gray-300 p-2">
                   <InputNoLabel
-                    id="account-code-input"
+                    id="account-id-input"
                     type="text"
-                    name={`code-${index}`}
-                    onChange={(e)=>accountIdOnChange(index, 'code', e)}
-                    value={rows[index].code}
+                    name={`id-${index}`}
+                    onChange={(e)=>accountIdOnChange(index, 'id', e)}
+                    value={participants[index].id}
                     placeholder="أدخل كود الحساب"
-                    listValues={codeRowIndex === index ? posibleAccounts : []}
+                    listValues={idRowIndex === index ? posibleAccounts : []}
                     onSelect={async(value)=> {
-                        handleChange(index, 'code', value)
+                        handleChange(index, 'id', value)
                         setPosibleAccounts([])
                       }
                     }
@@ -104,7 +106,7 @@ const ParticipantsTableForm = () => {
                       { name: "مدين", value: "0" },
                       { name: "دائن", value: "1" },
                     ]}
-                    value={rows[index].role} 
+                    value={participants[index].role} 
                     onChange={(e) => handleChange(index, "role", e.target.value)}
                   />
                 </td>
@@ -118,8 +120,6 @@ const ParticipantsTableForm = () => {
           </tbody>
         </table>
       </div>
-
-      {/* Add Row Button */}
       <button
         onClick={addRow}
         className="mt-2 bg-blue-500 text-white px-2 py-1 rounded-lg hover:bg-blue-600"
