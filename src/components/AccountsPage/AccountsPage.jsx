@@ -5,13 +5,15 @@ import TableEntity from "../TableEntity.jsx"
 import accountsServices from "../../services/accounts.js"
 
 import { useDispatch, useSelector } from "react-redux"
-import { setAccounts, setAccountsFormIdField, setAccountsFormNameField, toggleAccountFormState } from "../../reducers/accounts.js"
+import { setId, setName, setState } from "../../reducers/accountForm.js"
+import { setAccounts } from "../../reducers/accounts.js"
+import Header from "../Header/Header.jsx"
 
 const AccountsPage = ()=>
 {
   const dispatch = useDispatch()
-  const accounts = useSelector(state => state.accounts.accountsData)
-  const formState = useSelector(state => state.accounts.accountsForm.state)
+  const accounts = useSelector(state => state.accounts)
+  const formState = useSelector(state => state.accountForm.state)
   const getAllAccounts = async()=>
   {
     const accounts = await accountsServices.getAllAccounts()
@@ -30,15 +32,19 @@ const AccountsPage = ()=>
     if(!tr) return
     const userId = tr.getAttribute('data-id')
     const userName = tr.getAttribute('data-name')
-    dispatch(setAccountsFormIdField(userId))
-    dispatch(setAccountsFormNameField(userName))
+    dispatch(setId(userId))
+    dispatch(setName(userName))
     if(!formState) return
-    dispatch(toggleAccountFormState())
+    dispatch(setState(false))
   }
+
   return(
     <>
-      <ManageAccountsForm legend={'إنشاء/تعديل حساب'} />
-      <TableView heads={["كود", "الحساب"]} pt={'86px'} ml={'284px'} onClick={onClickEntity}>
+      <div className="sticky top-[0px]">
+        <Header/>
+        <ManageAccountsForm legend={'إنشاء/تعديل حساب'} />
+      </div>
+      <TableView heads={["كود", "الحساب"]} onClick={onClickEntity}>
         {
           accounts.map(account => {
             let data = {

@@ -1,15 +1,15 @@
 import React from 'react';
 
-const Details = ({listValues, onSelect}) => {
+const Details = ({listValues, onSelect, style}) => {
   if (!listValues || listValues.length === 0) return null;
   return (
-    <div className="absolute mt-16 w-full bg-white border rounded-lg shadow-lg z-10">
+    <div className="sticky w-full bg-white border rounded-lg shadow-lg z-50" style={style}>
       <ul className="list-none p-2 h-[150px] overflow-auto">
         {listValues.map(({id, name}) => (
           <li
             tabIndex={0}
             key={id}
-            onClick={() => onSelect(id)}
+            onClick={(event) => onSelect(id, event)}
             onKeyDown={(e)=>
             {
               if(e.key === 'Enter') onSelect(id)

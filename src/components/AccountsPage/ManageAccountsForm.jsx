@@ -1,23 +1,29 @@
 import React from "react";
-import Input from "../Input.jsx"
+import { Input } from "../Input.jsx";
 import accountsServices from "../../services/accounts.js";
 import { useDispatch, useSelector } from "react-redux";
-import { addAccount, setAccounts, setAccountsFormIdField, setAccountsFormNameField, toggleAccountFormState } from "../../reducers/accounts.js";
+import { setId, setName, setState } from "../../reducers/accountForm.js";
+import { setAccounts, addAccount } from "../../reducers/accounts.js";
 import { removeNotification, setErrorNotification } from "../../reducers/notification.js";
-const ManageAccountsForm = ({ legend }) => {
-  let idValue = useSelector(state => state.accounts.accountsForm.idField)
-  let nameValue = useSelector(state => state.accounts.accountsForm.nameField)
-  let formState = useSelector(state => state.accounts.accountsForm.state)
+import { useConfirm } from '../../customStates/useConfirm.js';
+
+import Form from "../Form.jsx";
+import transactionsServices from "../../services/transactions.js";
+const ManageAccountsForm = ({ legend, visibale, setVisibility }) => {
+  let id = useSelector(state => state.accountForm.id);
+  let name = useSelector(state => state.accountForm.name);
+  let formState = useSelector(state => state.accountForm.state);
+  let confirm = useConfirm();
   const dispatch = useDispatch()
   const submitHandler = async(e)=>
   {
     e.preventDefault()
-    const response = await accountsServices.createAccount(idValue, nameValue)
+    const response = await accountsServices.createAccount(id, name)
     if(response.state) 
     {
-      dispatch(addAccount({id: idValue, name: nameValue}))
-      dispatch(setAccountsFormIdField(""))
-      dispatch(setAccountsFormNameField(""))
+      dispatch(addAccount({id: id, name: name}))
+      dispatch(setId(""))
+      dispatch(setName(""))
       
     }
     else
@@ -30,24 +36,28 @@ const ManageAccountsForm = ({ legend }) => {
   const cancelHandler = (e)=>
   {
     e.preventDefault()
-    dispatch(toggleAccountFormState())
-    dispatch(setAccountsFormIdField(""))
-    dispatch(setAccountsFormNameField(""))
+    dispatch(setState(true))
+    dispatch(setId(""))
+    dispatch(setName(""))
   }
 
-  const removeAccountHandler = async(e)=>
+  const deleteHandler = async(e)=>
   {
-    e.preventDefault()
-    const response = await accountsServices.deleteAccount(idValue)
+    e.preventDefault();
+    const deleteConfirm = await confirm(`هل متأكد من طلبك لحذف الحساب؟`, "نعم، متأكد");
+    if(deleteConfirm === false) return;
+    const response = await accountsServices.deleteAccount(id)
     if(!response.state)
     {
-      dispatch(setErrorNotification(response.message))
+      const FOREIGN_KEY = "FOREIGN KEY constraint failed";
+      let message = response.message === FOREIGN_KEY? "ما زالت هنالك بيانات متعلقة بالموظف. يجب أن تحذف أولا." : response.message;
+      dispatch(setErrorNotification(message))
       setTimeout(()=> dispatch(removeNotification()), 3000)
       return
     }
-    dispatch(toggleAccountFormState())
-    dispatch(setAccountsFormIdField(""))
-    dispatch(setAccountsFormNameField(""))
+    dispatch(setState(true))
+    dispatch(setId(""))
+    dispatch(setName(""))
 
     const getAccountsResponse = await accountsServices.getAllAccounts()
     if(!getAccountsResponse.state) return
@@ -57,16 +67,16 @@ const ManageAccountsForm = ({ legend }) => {
   const editHandler = async(e)=>
   {
     e.preventDefault()
-    const response = await accountsServices.updateAccount(idValue, nameValue)
+    const response = await accountsServices.updateAccount(id, name)
     if(!response.state)
     {
       dispatch(setErrorNotification(response.message))
       setTimeout(()=> dispatch(removeNotification()), 3000)
       return
     }
-    dispatch(toggleAccountFormState())
-    dispatch(setAccountsFormIdField(""))
-    dispatch(setAccountsFormNameField(""))
+    dispatch(setState(true))
+    dispatch(setId(""))
+    dispatch(setName(""))
 
     const getAccountsResponse = await accountsServices.getAllAccounts()
     if(!getAccountsResponse.state) return
@@ -76,43 +86,39 @@ const ManageAccountsForm = ({ legend }) => {
   const idOnChange = (e)=>
   {
     const value = e.target.value
-    dispatch(setAccountsFormIdField(value))
+    dispatch(setId(value))
   }
 
   const nameOnChange = (e)=>
   {
     const value = e.target.value
-    dispatch(setAccountsFormNameField(value))
+    dispatch(setName(value))
   }
+  
   return (
-    <div className="fixed left-0 top-[86px] h-[calc(100%-86px)] max-w-1/5 p-4 bg-gray-100 shadow-lg">
-      <fieldset className="border border-gray-300 p-4 rounded-lg">
-        <legend className="text-lg font-semibold">{legend}</legend>
-        <form className="flex flex-col gap-4 mt-4" onSubmit={submitHandler}>
-          <Input disabled={!formState} name={'id'} label={'الكود'} type={'text'} placeholder={'أدخل كود الحساب مثل: 0000'} onChange={idOnChange} value={idValue} />
-          <Input name={'name'} label={'الإسم'} type={'text'} placeholder={'أدخل إسم الحساب مثل: أحمد'} onChange={nameOnChange} value={nameValue} />
-          {
-            formState
-            ? <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
-                أنشئ الحساب
-              </button>
-            :
-              <>
-                <button type="" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600" onClick={editHandler}>
-                  عدل الحساب
-                </button>
-                <button type="" className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600" onClick={removeAccountHandler}>
-                  احذف الحساب
-                </button>
-                <button type="" className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600" onClick={cancelHandler}>
-                  إلغاء
-                </button>
-              </>
-          }
-
-        </form>
-      </fieldset>
-    </div>
+    <Form legend={legend} submitHandler={submitHandler}>
+      <Input disabled={!formState} name={'id'} label={'الكود'} type={'text'} placeholder={'أدخل كود الحساب مثل: 0000'} onChange={idOnChange} value={id} />
+      <Input name={'name'} label={'الإسم'} type={'text'} placeholder={'أدخل إسم الحساب مثل: أحمد'} onChange={nameOnChange} value={name} />
+    
+      {
+        formState
+        ? <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+            أنشئ الحساب
+          </button>
+        :
+          <>
+            <button type="" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600" onClick={editHandler}>
+              عدل الحساب
+            </button>
+            <button type="" className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600" onClick={deleteHandler}>
+              احذف الحساب
+            </button>
+            <button type="" className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600" onClick={cancelHandler}>
+              إلغاء
+            </button>
+          </>
+        }
+    </Form>
   );
 };
 

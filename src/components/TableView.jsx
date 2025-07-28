@@ -1,22 +1,14 @@
 import React from "react"
 
 // TableView.jsx
-const TableView = ({ title, heads, pt, ml,children, onClick }) => {
-  // 
-  const paddingTop = pt ? pt : '0px';
-  const marginLeft = ml ? ml : '0px';
-  const style = {
-    paddingTop: paddingTop,
-    marginLeft: marginLeft,
-    minWidth: `calc(100% - ${marginLeft})`
-  }
-  const classs = `overflow-auto`
+const TableView = ({ title, heads, style,children, onClick, onDoubleClick }) => {
+
   return (
-    <div className={classs} style={style}>
-      <div className="p-4">
-        <h2 className="text-2xl font-semibold mb-4">{title}</h2>
-        <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-          <table className="w-full border-collapse" dir="rtl" onClick={onClick}>
+    <div className={`overflow-auto w-full`} style={style}>
+      <div>
+        <h2 className="text-2xl font-semibold">{title}</h2>
+        <div className="overflow-x-auto bg-white">
+          <table className="w-full border-collapse" dir="rtl" onClick={onClick} onDoubleClick={onDoubleClick}>
             <thead>
               <tr className="bg-gray-200 text-gray-700">
                 {heads.map((head, index) => (

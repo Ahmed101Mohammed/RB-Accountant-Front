@@ -1,16 +1,16 @@
-import React, {useState} from "react";
+import React from "react";
 import Details from "./Details.jsx";
-const Input = ({ type, name, label, step, placeholder, onChange, value, disabled, listValues, onSelect, ref }) => {
+export const Input = ({ type, name, label, step, placeholder, onChange, value, disabled, listValues, onSelect, ref }) => {
   return (
     <div className="relative flex flex-col" ref={ref}>
-      <label htmlFor={name} className="font-medium text-right">{label}</label>
+      <label htmlFor={name} className="font-normal text-right">{label}</label>
       <input
         dir="rtl"
         type={type}
         name={name}
         id={name}
         placeholder={placeholder}
-        className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 text-right focus:ring-blue-500"
+        className="border border-gray-300 p-1 rounded-lg focus:outline-none focus:ring-1 text-right focus:ring-blue-500"
         onChange={onChange}
         value={value}
         disabled={disabled}
@@ -28,5 +28,3 @@ const Input = ({ type, name, label, step, placeholder, onChange, value, disabled
     </div>
   );
 };
-
-export default Input

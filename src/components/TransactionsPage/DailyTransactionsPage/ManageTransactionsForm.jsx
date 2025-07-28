@@ -1,101 +1,99 @@
-import React, { useEffect, useRef, useState } from "react";
-import Input from "../../Input.jsx"
+import React, { useState } from "react";
+import { Input } from "../../Input.jsx"
 import { useDispatch, useSelector } from "react-redux";
 import { removeNotification, setErrorNotification } from "../../../reducers/notification.js";
-import { addTransaction, removeTransaction, reSetTransactionsFormDateField, setTransactions, setTransactionsFormAmountField, settransactionsFormCommentField, settransactionsFormCreditorIdField, settransactionsFormDateField, settransactionsFormDebtorIdField, setTransactionsFormTransactionId, toggleTransactionsFormState } from "../../../reducers/transactions.js";
+import { addTransaction, removeTransaction,  setTransactions} from "../../../reducers/transactions.js";
+import { reSetComment, reSetDate, reSetParticipants, reSetTransactionId, setComment, setDate, setState } from "../../../reducers/transactionForm.js";
 import transactionsServices from "../../../services/transactions.js";
-import accountsServices from "../../../services/accounts.js";
-const ManageTransactionsForm = ({ legend }) => {
-  let amount = useSelector(state => state.transactions.transactionsForm.amountField)
-  let debtorId = useSelector(state => state.transactions.transactionsForm.debtorIdField)
-  let creditorId = useSelector(state => state.transactions.transactionsForm.creditorIdField)
-  let comment = useSelector(state => state.transactions.transactionsForm.commentField)
-  let date = useSelector(state => state.transactions.transactionsForm.dateField)
-  let formState = useSelector(state => state.transactions.transactionsForm.state)
-  // let posibleAccounts = useSelector(state => state.transactions.transactionsForm.accountsListOptions)
-  let transactionId = useSelector(state => state.transactions.transactionsForm.transactionId)
-  const [possibleAccountsForCreditor, setPossibleAccountsForCreditor] = useState()
-  const [possibleAccountsForDebtor, setPossibleAccountsForDebtor] = useState()
-  const dispatch = useDispatch()
-  const wrapperRefForCreditor = useRef(null)
-  const wrapperRefForDebtor = useRef(null)
-  useEffect(()=>
-    {
-      const handleClickOutsideCreditor = (e)=>
-      {
-        if(wrapperRefForCreditor.current && !wrapperRefForCreditor.current.contains(e.target))
-        {
-          setPossibleAccountsForCreditor([])
-        }
-      }
-  
-      document.addEventListener("mousedown", handleClickOutsideCreditor)
-  
-      return ()=>
-          {
-            document.removeEventListener("mousedown", handleClickOutsideCreditor)
-          }
-    },[])
+import Textarea from "../../Textarea.jsx";
+import ParticipantsTableForm from "./ParticipantsTableForm.jsx";
+import { ArrowDownDoubleIcon, Cancel01Icon } from "hugeicons-react";
+import { useConfirm } from "../../../customStates/useConfirm.js";
+import { reSetButtonName, reSetMessage, toggleVisibility } from "../../../reducers/confirm.js";
+const ManageTransactionsForm = ({ref}) => {
 
-  useEffect(()=>
-    {
-      const handleClickOutsideDebtor = (e)=>
-      {
-        if(wrapperRefForDebtor.current && !wrapperRefForDebtor.current.contains(e.target))
-        {
-          setPossibleAccountsForDebtor([])
-        }
-      }
-  
-      document.addEventListener("mousedown", handleClickOutsideDebtor)
-  
-      return ()=>
-          {
-            document.removeEventListener("mousedown", handleClickOutsideDebtor)
-          }
-    },[])
+  let comment = useSelector(state => state.transactionForm.comment);
+  let date = useSelector(state => state.transactionForm.date);
+  let participants = useSelector(state => state.transactionForm.participants)
+  let formState = useSelector(state => state.transactionForm.state);
+  let transactionId = useSelector(state => state.transactionForm.transactionId)
+  let confirm = useConfirm()
+
+  const transactions = useSelector(state => state.transactions)
+
+  const dispatch = useDispatch()
+
+  let [visibale, setVisibility] = useState(true)
+  if(!visibale){
+    return (
+      <div dir="rtl" className="w-full">
+        <button
+          className="bg-blue-500 text-white px-2 py-1 w-full flex justify-center opacity-90 hover:opacity-100 active:opacity-100 transition-opacity"
+          onClick={() => setVisibility(true)}
+        >
+          <ArrowDownDoubleIcon size={24}/>
+        </button>
+      </div>
+    )
+  }
 
   const reSetForm = ()=>
   {
-    dispatch(setTransactionsFormAmountField(""))
-    dispatch(settransactionsFormDebtorIdField(""))
-    dispatch(settransactionsFormCreditorIdField(""))
-    dispatch(settransactionsFormCommentField(""))
-    dispatch(reSetTransactionsFormDateField())
-    dispatch(setTransactionsFormTransactionId(undefined))
+    dispatch(reSetDate());
+    dispatch(reSetComment());
+    dispatch(reSetParticipants());
+    dispatch(reSetTransactionId());
   }
-  const submitHandler = async(e)=>
+
+  const onSubmitHandler = async(e)=>
   {
     e.preventDefault()
-    const response = await transactionsServices.createTransaction(amount, debtorId, creditorId, comment, date)
-    if(response.state) 
-    {
-      let newTransactionId = response.data[0].lastInsertRowid
-      const getTransactionByIdResponse = await transactionsServices.getTransactionById(newTransactionId)
-      
-      if(getTransactionByIdResponse.state)
-      {
-        dispatch(addTransaction(getTransactionByIdResponse.data[0]))
-      }
-      reSetForm()
-    }
-    else
+    const target = e.target;
+    // get the data from the form in this format:
+    /*
+    { date, comment, participants: {amount, id, role}}
+    */
+
+    const transactionData = {date, comment, participants};
+    const response = await transactionsServices.createTransaction(transactionData);
+    if(response.state === false)
     {
       dispatch(setErrorNotification(response.message))
-      setTimeout(()=> dispatch(removeNotification()), 5000)
+      setTimeout(()=> dispatch(removeNotification()), 3000)
+      return
     }
+    reSetForm()
+
+    const newTransactionId = response.data[0].lastInsertRowid
+    const newTransactionDataResponse = await transactionsServices.getTransactionById(newTransactionId);
+    if(newTransactionDataResponse.state === false)
+    {
+      dispatch(setErrorNotification(newTransactionDataResponse.message))
+      setTimeout(()=> dispatch(removeNotification()), 3000)
+      return
+    }
+    dispatch(addTransaction(newTransactionDataResponse.data[0]))
   }
 
   const cancelHandler = (e)=>
   {
     e.preventDefault()
-    dispatch(toggleTransactionsFormState())
+    dispatch(setState(true))
     reSetForm()
   }
 
-  const removeAccountHandler = async(e)=>
+  const deleteHandler = async(e)=>
   {
     e.preventDefault()
+    const confirmDelete = await confirm("هل متأكد من حذف هذه المعاملة؟", "متأكد");
+    if(confirmDelete === false) 
+    {
+      dispatch(reSetMessage());
+      dispatch(reSetButtonName());
+      dispatch(toggleVisibility());
+      return;
+    }
+
     const response = await transactionsServices.deleteTransaction(transactionId)
     if(!response.state)
     {
@@ -103,114 +101,75 @@ const ManageTransactionsForm = ({ legend }) => {
       setTimeout(()=> dispatch(removeNotification()), 3000)
       return
     }
-    dispatch(toggleTransactionsFormState())
+    
+    dispatch(setState(true))
     reSetForm()
     dispatch(removeTransaction(transactionId))
   }
 
-  const editHandler = async(e)=>
+  const updateHandler = async(e)=>
   {
     e.preventDefault()
-    const response = await transactionsServices.updateTransaction(transactionId, amount, debtorId, creditorId, comment, date)
+    /*
+    { date, comment, participants: {amount, id, role}}
+    */
+    const transactiondData = {date, comment, participants};
+    const response = await transactionsServices.updateTransaction(transactionId, transactiondData)
     if(!response.state)
     {
       dispatch(setErrorNotification(response.message))
       setTimeout(()=> dispatch(removeNotification()), 3000)
       return
     }
-    dispatch(toggleTransactionsFormState())
-    reSetForm()
-    const getUpdatedTransaction = await transactionsServices.getTransactionById(transactionId)
-    dispatch(removeTransaction(transactionId))
-    if(getUpdatedTransaction.state) dispatch(addTransaction(getUpdatedTransaction.data[0]))
-
+    const getUpdatedTransaction = await transactionsServices.getTransactionById(transactionId);
+    dispatch(removeTransaction(transactionId));
+    if(getUpdatedTransaction.state) dispatch(addTransaction(getUpdatedTransaction.data[0]));
+    reSetForm() 
+    dispatch(setState(true))
   }
-
-  const debtorIdOnChange = async(e)=>
-  {
-    dispatch(settransactionsFormDebtorIdField(e.target.value))
-    const response = await accountsServices.getPossibleUsers(e.target.value)
-    if(response.state)
-    {
-      setPossibleAccountsForDebtor(response.data)
-    }
-    else
-    {
-      setPossibleAccountsForDebtor([])
-    }
-  }
-  const creditorIdOnChange = async(e)=>
-  {
-    dispatch(settransactionsFormCreditorIdField(e.target.value))
-    const response = await accountsServices.getPossibleUsers(e.target.value)
-    if(response.state)
-    {
-      setPossibleAccountsForCreditor(response.data)
-    }
-    else
-    {
-      setPossibleAccountsForCreditor([])
-    }
-  }
-
+ 
   return (
-    <div className="fixed left-0 top-[86px] max-h-[calc(100%-86px)] max-w-1/5 p-4 bg-gray-100 shadow-lg overflow-auto" >
-      <fieldset className="border border-gray-300 p-4 rounded-lg">
-        <legend className="text-lg font-semibold">{legend}</legend>
-        <form className="flex flex-col gap-4 mt-4" onSubmit={submitHandler}>
-          <Input name={'amount'} label={'المبلغ'} 
-                type={'number'} step={"0.01"} 
-                placeholder={'أدخل مبلغ المعاملة مثل: 23889'} 
-                onChange={(e)=> dispatch(setTransactionsFormAmountField(e.target.value))} value={amount} />
-          <Input name={'debtor-id'} label={'كود المدين'} ref={wrapperRefForDebtor} 
-                type={'text'} placeholder={'أدخل كود حساب المدين مثل: 0000'} 
-                onChange={debtorIdOnChange} value={debtorId} 
-                onSelect={(value)=> {
-                  dispatch(settransactionsFormDebtorIdField(value))
-                  setPossibleAccountsForDebtor([])
-                  }} listValues={possibleAccountsForDebtor}/>
-          <Input name={'creditor-id'} label={'كود الدائن'} ref={wrapperRefForCreditor}
-                type={'text'} placeholder={'أدخل كود حساب الدائن مثل: 0001'} 
-                onChange={creditorIdOnChange} value={creditorId} 
-                onSelect={(value)=> {
-                  dispatch(settransactionsFormCreditorIdField(value))
-                  setPossibleAccountsForCreditor([])
-                  }} listValues={possibleAccountsForCreditor}
-                />
-          <div className="flex flex-col">
-            <label htmlFor="comment" className="font-medium text-right">تعليق</label>
-            <textarea name={'comment'} type={'text'} dir="rtl" className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 text-right focus:ring-blue-500"
-                      placeholder={'أدخل تعليق أو ملاحظة متعلق بالمعاملة'} 
-                      onChange={(e)=> dispatch(settransactionsFormCommentField(e.target.value))} value={comment} ></textarea>
-          </div>
-          <Input name={'date'} label={'تاريخ المعاملة'} 
-                type={'date'} placeholder={'أدخل تارخ المعاملة مثل: 22-2-2025'} 
-                onChange={(e)=> {
-                  dispatch(settransactionsFormDateField(e.target.value))
-                }} value={date} />
-          {
-            formState
-            ? <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
-                أنشئ معاملة
+    <form className="w-[100%] p-2 bg-gray-100 border border-gray-600" onSubmit={onSubmitHandler} ref={ref}>
+      <div dir="rtl" className="mb-2">
+        <button onClick={()=> setVisibility(false)}><Cancel01Icon size={24}/></button>
+      </div>
+      <div className="w-[100%] grid gap-6 grid-cols-3" dir="rtl">
+        <ParticipantsTableForm/>
+        <fieldset>
+            <Input name={'date'} label={'تاريخ المعاملة'} 
+              type={'date'} placeholder={'أدخل تارخ المعاملة مثل: 22-2-2025'} 
+              onChange={(e)=> {
+                dispatch(setDate(e.target.value))
+              }} value={date} />
+              <Textarea name={"comment"} label={"بيان"} placeholder={'أدخل تعليق أو ملاحظة متعلق بالمعاملة'}
+              onChange={(e)=> dispatch(setComment(e.target.value))} value={comment} 
+              style={{maxHeight: '100px'}}
+            />
+        </fieldset>
+      </div>
+      <fieldset className={`grid gap-2 grid-cols-3 mt-4`}>
+        {
+          formState
+          ? <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 col-span-3">
+              أنشئ معاملة
+            </button>
+          :
+            <>
+              <button type="" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600" onClick={updateHandler}>
+                عدل المعاملة
               </button>
-            :
-              <>
-                <button type="" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600" onClick={editHandler}>
-                  عدل المعاملة
-                </button>
-                <button type="" className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600" onClick={removeAccountHandler}>
-                  احذف المعاملة
-                </button>
-                <button type="" className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600" onClick={cancelHandler}>
-                  إلغاء
-                </button>
-              </>
-          }
-
-        </form>
+              <button type="" className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600" onClick={deleteHandler}>
+                احذف المعاملة
+              </button>
+              <button type="" className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600" onClick={cancelHandler}>
+                إلغاء
+              </button>
+            </>
+        }
       </fieldset>
-    </div>
-  );
+    </form>
+  )
+ 
 };
 
 export default ManageTransactionsForm;
