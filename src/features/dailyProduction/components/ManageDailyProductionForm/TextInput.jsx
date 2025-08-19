@@ -1,13 +1,14 @@
 import React from "react";
 import Details from "../../../../components/Details.jsx";
 
-export const TextInput = ({ value, onChange, label, icon: Icon, placeholder = '', className = '', listValues=[], onSelect, onFocus }) => (
+export const TextInput = ({ value, onChange, label, icon: Icon, placeholder = '', className = '', listValues=[], onSelect, onFocus, inputRef }) => (
   <div className={`space-y-2 ${className}`}>
     <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
       {Icon && <Icon size={16} />}
       {label}
     </label>
     <input
+      ref={inputRef}
       dir="rtl"
       type="text"
       value={value}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Input } from "../../../components/Input.jsx"
 import { useDispatch, useSelector } from "react-redux";
 import { reSetFixedId, reSetId, reSetName, setId, setName, setState } from "../reducers/itemForm.js";
@@ -17,6 +17,14 @@ export const ManageItemsForm = ({ legend, visibale, setVisibility }) => {
   let confirm = useConfirm();
 
   const dispatch = useDispatch()
+
+  const firstInputRef = useRef()
+  const focusOnFirstInput = ()=> 
+  {
+    if(!firstInputRef) return;
+    setTimeout(()=> firstInputRef.current.focus(), 0)
+  }
+  useEffect(()=>{focusOnFirstInput()}, [firstInputRef])
 
   const submitHandler = async(e)=>
   {
@@ -40,6 +48,7 @@ export const ManageItemsForm = ({ legend, visibale, setVisibility }) => {
     dispatch(addItem(getItemResponse.data[0]));
     dispatch(reSetId());
     dispatch(reSetName());
+    focusOnFirstInput();
   }
 
   const cancelHandler = (e)=>
@@ -49,6 +58,7 @@ export const ManageItemsForm = ({ legend, visibale, setVisibility }) => {
     dispatch(reSetId());
     dispatch(reSetName());
     dispatch(reSetFixedId())
+    focusOnFirstInput();
   }
 
   const deleteHandler = async(e)=>
@@ -69,6 +79,7 @@ export const ManageItemsForm = ({ legend, visibale, setVisibility }) => {
     dispatch(reSetId())
     dispatch(reSetName())
     dispatch(reSetFixedId())
+    focusOnFirstInput()
     const getItemsResponse = await getAllItems()
     if(!getItemsResponse.state) return
     dispatch(setItems(getItemsResponse.data))
@@ -87,7 +98,7 @@ export const ManageItemsForm = ({ legend, visibale, setVisibility }) => {
     dispatch(setState(true))
     dispatch(reSetId())
     dispatch(reSetName())
-
+    focusOnFirstInput();
     const getItemsResponse = await getAllItems()
     if(!getItemsResponse.state) return
     dispatch(setItems(getItemsResponse.data))
@@ -107,7 +118,7 @@ export const ManageItemsForm = ({ legend, visibale, setVisibility }) => {
   
   return (
     <Form legend={legend} submitHandler={submitHandler}>
-      <Input disabled={!formState} name={'id'} label={'الكود'} type={'text'} placeholder={'أدخل كود الصنف مثل: 0000'} onChange={idOnChange} value={id} />
+      <Input name={'id'} label={'الكود'} type={'text'} placeholder={'أدخل كود الصنف مثل: 0000'} onChange={idOnChange} value={id} inputRef={firstInputRef} />
       <Input name={'name'} label={'الإسم'} type={'text'} placeholder={'أدخل إسم الصنف مثل: مسمار 1/2 بوصة'} onChange={nameOnChange} value={name} />
     
       {

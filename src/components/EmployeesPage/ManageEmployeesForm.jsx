@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Input } from "../Input.jsx"
 import { useDispatch, useSelector } from "react-redux";
 import { reSetFixedId, reSetId, reSetName, setId, setName, setState } from "../../reducers/employeeForm.js";
@@ -18,6 +18,14 @@ export const ManageEmployeesForm = ({ legend, visibale, setVisibility }) => {
   let confirm = useConfirm();
 
   const dispatch = useDispatch()
+
+  const firstInputRef = useRef()
+  const focusOnFirstInput = ()=> 
+  {
+    if(!firstInputRef) return;
+    setTimeout(()=> firstInputRef.current.focus(), 0)
+  }
+  useEffect(()=>{focusOnFirstInput()}, [firstInputRef])
 
   const submitHandler = async(e)=>
   {
@@ -41,6 +49,7 @@ export const ManageEmployeesForm = ({ legend, visibale, setVisibility }) => {
     dispatch(addEmployee(getEmployeeResponse.data[0]));
     dispatch(reSetId());
     dispatch(reSetName());
+    focusOnFirstInput()
   }
 
   const cancelHandler = (e)=>
@@ -50,6 +59,7 @@ export const ManageEmployeesForm = ({ legend, visibale, setVisibility }) => {
     dispatch(reSetId());
     dispatch(reSetName());
     dispatch(reSetFixedId())
+    focusOnFirstInput();
   }
 
   const deleteHandler = async(e)=>
@@ -70,7 +80,7 @@ export const ManageEmployeesForm = ({ legend, visibale, setVisibility }) => {
     dispatch(setState(true))
     dispatch(reSetId())
     dispatch(reSetName())
-
+    focusOnFirstInput()
     const getEmployeesResponse = await getAllEmployees()
     if(!getEmployeesResponse.state) return
     dispatch(setEmployees(getEmployeesResponse.data))
@@ -89,7 +99,7 @@ export const ManageEmployeesForm = ({ legend, visibale, setVisibility }) => {
     dispatch(setState(true))
     dispatch(reSetId())
     dispatch(reSetName())
-
+    focusOnFirstInput();
     const getEmployeesResponse = await getAllEmployees()
     if(!getEmployeesResponse.state) return
     dispatch(setEmployees(getEmployeesResponse.data))
@@ -109,7 +119,7 @@ export const ManageEmployeesForm = ({ legend, visibale, setVisibility }) => {
   
   return (
     <Form legend={legend} submitHandler={submitHandler}>
-      <Input disabled={!formState} name={'id'} label={'الكود'} type={'text'} placeholder={'أدخل كود الموظف مثل: 0000'} onChange={idOnChange} value={id} />
+      <Input disabled={!formState} name={'id'} label={'الكود'} type={'text'} inputRef={firstInputRef} placeholder={'أدخل كود الموظف مثل: 0000'} onChange={idOnChange} value={id} />
       <Input name={'name'} label={'الإسم'} type={'text'} placeholder={'أدخل إسم الموظف مثل: أحمد'} onChange={nameOnChange} value={name} />
     
       {

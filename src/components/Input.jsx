@@ -1,10 +1,11 @@
 import React from "react";
 import Details from "./Details.jsx";
-export const Input = ({ type, name, label, step, placeholder, onChange, value, disabled, listValues, onSelect, ref }) => {
+export const Input = ({ type, name, label, step, placeholder, onChange, value, disabled, listValues, onSelect, ref, inputRef }) => {
   return (
     <div className="relative flex flex-col" ref={ref}>
       <label htmlFor={name} className="font-normal text-right">{label}</label>
       <input
+        ref={inputRef}
         dir="rtl"
         type={type}
         name={name}

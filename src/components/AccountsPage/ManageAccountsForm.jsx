@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Input } from "../Input.jsx";
 import accountsServices from "../../services/accounts.js";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,13 +8,25 @@ import { removeNotification, setErrorNotification } from "../../reducers/notific
 import { useConfirm } from '../../customStates/useConfirm.js';
 
 import Form from "../Form.jsx";
-import transactionsServices from "../../services/transactions.js";
-const ManageAccountsForm = ({ legend, visibale, setVisibility }) => {
+const ManageAccountsForm = ({ legend }) => {
   let id = useSelector(state => state.accountForm.id);
   let name = useSelector(state => state.accountForm.name);
   let formState = useSelector(state => state.accountForm.state);
   let confirm = useConfirm();
   const dispatch = useDispatch()
+
+  const firstInputRef = useRef()
+  const focusOnFirstInput = ()=> 
+  {
+    if(!firstInputRef) return;
+    setTimeout(()=> firstInputRef.current.focus(), 0)
+  }
+
+  useEffect(()=>
+  {
+    focusOnFirstInput();
+  }, [firstInputRef])
+
   const submitHandler = async(e)=>
   {
     e.preventDefault()
@@ -24,7 +36,7 @@ const ManageAccountsForm = ({ legend, visibale, setVisibility }) => {
       dispatch(addAccount({id: id, name: name}))
       dispatch(setId(""))
       dispatch(setName(""))
-      
+      focusOnFirstInput();
     }
     else
     {
@@ -39,6 +51,7 @@ const ManageAccountsForm = ({ legend, visibale, setVisibility }) => {
     dispatch(setState(true))
     dispatch(setId(""))
     dispatch(setName(""))
+    focusOnFirstInput();
   }
 
   const deleteHandler = async(e)=>
@@ -58,7 +71,7 @@ const ManageAccountsForm = ({ legend, visibale, setVisibility }) => {
     dispatch(setState(true))
     dispatch(setId(""))
     dispatch(setName(""))
-
+    focusOnFirstInput();
     const getAccountsResponse = await accountsServices.getAllAccounts()
     if(!getAccountsResponse.state) return
     dispatch(setAccounts(getAccountsResponse.data))
@@ -77,7 +90,7 @@ const ManageAccountsForm = ({ legend, visibale, setVisibility }) => {
     dispatch(setState(true))
     dispatch(setId(""))
     dispatch(setName(""))
-
+    focusOnFirstInput();
     const getAccountsResponse = await accountsServices.getAllAccounts()
     if(!getAccountsResponse.state) return
     dispatch(setAccounts(getAccountsResponse.data))
@@ -97,7 +110,7 @@ const ManageAccountsForm = ({ legend, visibale, setVisibility }) => {
   
   return (
     <Form legend={legend} submitHandler={submitHandler}>
-      <Input disabled={!formState} name={'id'} label={'الكود'} type={'text'} placeholder={'أدخل كود الحساب مثل: 0000'} onChange={idOnChange} value={id} />
+      <Input disabled={!formState} name={'id'} label={'الكود'} type={'text'} placeholder={'أدخل كود الحساب مثل: 0000'} inputRef={firstInputRef} onChange={idOnChange} value={id} />
       <Input name={'name'} label={'الإسم'} type={'text'} placeholder={'أدخل إسم الحساب مثل: أحمد'} onChange={nameOnChange} value={name} />
     
       {

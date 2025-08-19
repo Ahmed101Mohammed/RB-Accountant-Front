@@ -31,6 +31,9 @@ const Home = () => {
           <Link to={'/dailyProduction'}>
             <ServiceCard name='الإنتاج اليومي' description='تسجيل الإنتاج اليومي وحذفه والتعديل عليه' />
           </Link>
+          {/* <Link to={'/itemPricingCalculator'}>
+            <ServiceCard name='حاسبة تسعير صنف' description='حساب تكلفة إنتاج وحدة من صنف' />
+          </Link> */}
         </div>
       </div>
     </>

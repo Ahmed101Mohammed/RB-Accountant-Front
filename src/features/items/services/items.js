@@ -14,31 +14,16 @@ export const getItemById = async(id) =>
 
 export const getPossibleItems = async(partialIdintifier)=>
 {
-  const schema = Joi.object({
-    partialIdintifier: Joi
-        .string()
-        .pattern(/^\d+$/, 'كود الصنف يحتوي على أرقام فقط')
-        .max(20)
-        .messages({
-          'string.max': 'أقصى طول لكود الصنف 20 رقما',
-          'string.pattern.base': 'كود الصنف يحتوي على أرقام فقط',
-        }),
-  })
-
-  const validationResponse = schema.validate({partialIdintifier})
-  let partialIdResponse;
   let partialNameResponse = await window.apis.getItemsItsNameContain(partialIdintifier);
-
-  if(validationResponse.error) return partialNameResponse // if the id formate is wrong
-  partialIdResponse = await window.apis.getItemsItsIdContain(partialIdintifier)
+  let partialIdResponse = await window.apis.getItemsItsIdContain(partialIdintifier);
   if(partialIdResponse.state && partialNameResponse.state) // if both are true state
   {
     let fullData = partialIdResponse.data.concat(partialNameResponse.data)
     let pureData = {}
     for(let data of fullData)
     {
-      if(pureData[data.id]) continue
-      pureData[data.id] = data
+      if(pureData[data.internalId]) continue
+      pureData[data.internalId] = data
     }
     partialIdResponse.data = Object.values(pureData)
     return partialIdResponse
