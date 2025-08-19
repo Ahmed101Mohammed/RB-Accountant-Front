@@ -13,6 +13,7 @@ import EmployeesPage from './components/EmployeesPage/EmployeesPage.jsx'
 import { MachinesPage } from './features/machines/components/MachinesPage.jsx'
 import { ItemsPage } from './features/items/components/ItemsPage.jsx'
 import { DailyProductionPage } from './features/dailyProduction/components/DailyProductionPage.jsx'
+import { ItemPricingCalculatorPage } from './features/itemPricingCalculator/components/ItemPricingCalculatorPage.jsx'
 const App = () => {
  
   return (
@@ -28,6 +29,7 @@ const App = () => {
         <Route path='/daily_transactions' element={<DailyTransactionsPage/>}/>
         <Route path='/discover_account_transactions' element={<AccountStatementPage/>}/>
         <Route path='/dailyProduction' element={<DailyProductionPage/>}/>
+        {/* <Route path='/itemPricingCalculator' element={<ItemPricingCalculatorPage/>} /> */}
       </Routes>
       <ConfirmMessage/>
       <Notification/>

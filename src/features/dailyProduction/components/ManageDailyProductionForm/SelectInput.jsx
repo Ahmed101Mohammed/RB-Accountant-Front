@@ -14,7 +14,7 @@ export const SelectInput = ({ value, onChange, options, label, icon: Icon, place
     >
       <option value="" disabled hidden>{placeholder}</option>
       {options.map((option) => (
-        <option key={option.value} value={option.value}>
+        <option key={option.label} value={option.value}>
           {option.label}
         </option>
       ))}

@@ -22,6 +22,18 @@ export const getDailyProductionById = async(dailyProductionId) =>
   return response
 }
 
+export const getItemStartAndEndProductionsDate = async(itemId) =>
+{
+  const response = await window.apis.getItemStartAndEndProductionsDate(itemId);
+  return response;
+}
+
+export const getItemProductionQuantitiesTotalForAPeriod = async(itemId, startPeriod, endPeriod) =>
+{
+  const response = await window.apis.getItemProductionQuantitiesTotalForAPeriod(itemId, startPeriod, endPeriod);
+  return response;
+}
+
 export const deleteDailyProductionById = async(dailyProductionId) =>
 {
   const response = await window.apis.deleteDailyProductionById(dailyProductionId);

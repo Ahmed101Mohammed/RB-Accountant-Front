@@ -78,7 +78,7 @@ const DetailRow = ({ detail, detailIndex, shiftIndex, itemIndex, shiftStart, shi
               setPosibleMachines([]);
             }
           }
-          onFocus={()=> setPosibleEmployees([])}
+          onFocus={()=> setPosibleMachines([])}
         />
       </td>
       <td className="p-2 border-b">
@@ -92,7 +92,7 @@ const DetailRow = ({ detail, detailIndex, shiftIndex, itemIndex, shiftStart, shi
               setPosibleEmployees([]);
             }
           }
-          onFocus={()=> setPosibleMachines([])}
+          onFocus={()=> setPosibleEmployees([])}
         />
       </td>
       <td className="p-2 border-b">
@@ -122,6 +122,7 @@ const DetailRow = ({ detail, detailIndex, shiftIndex, itemIndex, shiftStart, shi
       </td>
       <td className="p-2 border-b">
         <NumberInput
+          className="bg-red-100"
           value={detail.lowQualityQuantity}
           onChange={(value) => updateDetailField('lowQualityQuantity', value)}
           onFocus={emptyPosibleties}

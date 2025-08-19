@@ -1,25 +1,31 @@
 import React, { useEffect, useRef } from "react";
 import { ManageDailyProductionForm } from "./ManageDailyProductionForm/ManageDailyProductionForm.jsx";
-
 import { useDispatch, useSelector } from "react-redux";
 import Header from "../../../components/Header/Header.jsx";
-import { getAllDailyProductionRecords, getDailyProductionById } from "../services/dailyProduction.js";
-import { setDailyProductions } from "../reducers/dailyProductions.js";
+import { deleteDailyProductionById, getAllDailyProductionRecords, getDailyProductionById } from "../services/dailyProduction.js";
+import { removeDailyProduction, setDailyProductions } from "../reducers/dailyProductions.js";
 import TableView from "../../../components/TableView.jsx";
 import TableEntity from "../../../components/TableEntity.jsx";
-import { Table2 } from "lucide-react";
 import { shiftArabicName } from "../utils/shiftArabicName.js";
 import { convert24HourTo12 } from "../utils/convert24HourTo12.js";
-import { removeNotification, setErrorNotification } from "../../../reducers/notification.js";
-import { setCreateMode, setDailyProductionForm, setDailyProductionId, setVisibility } from "../reducers/dailyProductionForm.js";
+import { removeNotification, setErrorNotification, setSuccessNotification } from "../../../reducers/notification.js";
+import { reSetDailyProduction, setCreateMode, setDailyProductionForm, setDailyProductionId, setVisibility } from "../reducers/dailyProductionForm.js";
+import { Menu, Item, useContextMenu } from "react-contexify";
+import 'react-contexify/ReactContexify.css'
+import { useConfirm } from "../../../customStates/useConfirm.js";
 export const DailyProductionPage = ()=>
 {
-  const dispatch = useDispatch()
+  const  MENU_ID = 'dailyProductionEntity'
+  const { show } = useContextMenu({id: MENU_ID})
 
+  const confirm  = useConfirm();
+  
+  const dispatch = useDispatch()
+  const { createMode, date, shifts, dailyProductionId } = useSelector(state => state.dailyProductionForm);
+  
   const bottomRef = useRef(null);
 
   const dailyProductions = useSelector(state => state.dailyProductions)
-  // const formState = useSelector(state => state.itemForm.state)
 
   const getAllDailyProduction_ = async()=> 
   {
@@ -40,10 +46,59 @@ export const DailyProductionPage = ()=>
     getAllDailyProduction_()
   }, [])
 
-  const onDoubleClickEntity = async(e)=>
+  const reSetDailyProductionFormStatus = () =>
+  {
+    dispatch(reSetDailyProduction());
+    dispatch(setDailyProductionId(null));
+    dispatch(setCreateMode(true));
+    dispatch(setVisibility(false));
+  }
+
+  const deleteHandler = async () =>
+  {
+    if(!dailyProductionId) return;
+
+    const deleteConfirm = await confirm(`هل أنت متأكد من حذف هذه اليومية؛ سيؤدي ذلك، إلى حذف جميع الورديات، والتفاصيل المتعلقة بهذه اليومية.`, "نعم، متأكد");
+    if(deleteConfirm === false) return;
+
+    const deleteDailyProductionResponse = await deleteDailyProductionById(dailyProductionId);
+    if(!deleteDailyProductionResponse.state)
+    {
+      dispatch(setErrorNotification(deleteDailyProductionResponse.message));
+      setTimeout(()=> dispatch(removeNotification()), 5000);
+      return;
+    }
+
+    dispatch(setSuccessNotification("تم حذف يومية الإنتاج بنجاح"));
+    setTimeout(()=> dispatch(removeNotification()), 5000);
+    
+    dispatch(removeDailyProduction(dailyProductionId));
+    reSetDailyProductionFormStatus();
+  }
+
+  const editHandler = async () =>
+  {
+    if(!dailyProductionId) return;
+    dispatch(setVisibility(true));
+    dispatch(setCreateMode(false));
+  }
+
+  const copyHandler = async () =>
+  {
+    dispatch(setVisibility(true));
+    dispatch(setCreateMode(true));
+  }
+
+  const onRightClickEntity = async(e) =>
   {
     const tr = e.target.closest("tr");
     if(!tr) return;
+    show({event: e, props: {key: 'value'}});
+    setEntityDataToForm(tr);
+  }
+
+  const setEntityDataToForm = async(tr)=>
+  {
     const dailyProductionId = tr.getAttribute('data-id');
     if(!dailyProductionId) return;
     const getDailyProdcutionResponse = await getDailyProductionById(dailyProductionId);
@@ -85,8 +140,6 @@ export const DailyProductionPage = ()=>
 
     dispatch(setDailyProductionForm(newState));
     dispatch(setDailyProductionId(dailyProductionId));
-    dispatch(setCreateMode(false));
-    dispatch(setVisibility(true));
   }
 
   return(
@@ -100,8 +153,9 @@ export const DailyProductionPage = ()=>
           "التاريخ", "الوردية", "تبدأ", "تنتهي", "كود الصنف", 
           "الصنف", "كود العميل", "العميل", "كود الماكنة", "الماكنة", 
           "كود العامل", "العامل", "بدأ", "انتهى", "إنتاج جيد", "إنتاج سيء"
-        ]} 
-        onDoubleClick={onDoubleClickEntity}>
+        ]}
+        onContextMenu={onRightClickEntity}
+        >
         {
           dailyProductions.map(({id, body})=> {
             const dailyProductionId = id;
@@ -158,6 +212,11 @@ export const DailyProductionPage = ()=>
           })
         }
       </TableView>
+      <Menu id={MENU_ID}>
+        <Item id="copy" onClick={copyHandler}>نسخ</Item>
+        <Item id="edit" onClick={editHandler}>تعديل</Item>
+        <Item id="delete" className="bg-red-100" onClick={deleteHandler}>حذف</Item>
+      </Menu>
       <span ref={bottomRef}></span>
     </>
   )

@@ -14,23 +14,8 @@ const getAccountById = async(id) =>
 
 const getPossibleUsers = async(partialIdintifier)=>
 {
-  const schema = Joi.object({
-    partialIdintifier: Joi
-        .string()
-        .pattern(/^\d+$/, 'كود الحساب يحتوي على أرقام فقط')
-        .max(20)
-        .messages({
-          'string.max': 'أقصى طول لكود الحساب 20 رقما',
-          'string.pattern.base': 'كود الحساب يحتوي على أرقام فقط',
-        }),
-  })
-
-  const validationResponse = schema.validate({partialIdintifier})
-  let partialIdResponse;
-  let partialNameResponse = await window.apis.getAccountsItsNameContain(partialIdintifier);
-
-  if(validationResponse.error) return partialNameResponse // if the id formate is wrong
-  partialIdResponse = await window.apis.getAccountsItsIdContain(partialIdintifier)
+  let partialNameResponse = await window.apis.getAccountsItsNameContain(partialIdintifier)
+  let partialIdResponse = await window.apis.getAccountsItsIdContain(partialIdintifier)
   if(partialIdResponse.state && partialNameResponse.state) // if both are true state
   {
     let fullData = partialIdResponse.data.concat(partialNameResponse.data)
