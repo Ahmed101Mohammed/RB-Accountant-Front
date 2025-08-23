@@ -67,11 +67,13 @@ export const SearchDailyProductionForm = ()=>
       setTimeout(()=> dispatch(removeNotification()), 5000)
       return;
     }
+
     const responseDetailed = await getAllDailyProductionsForItemForPeriod(itemId, startPeriod, endPeriod);
     if(responseDetailed.state)
     {
       setDailyProductions(responseDetailed.data)
     }
+
     const {highQualityQuantity, lowQualityQuantity} = response.data[0];
     setQuantities({highQualityQuantity, lowQualityQuantity})
     focusOnFirstInput()
@@ -136,7 +138,7 @@ export const SearchDailyProductionForm = ()=>
             </div>
           </form>
           {
-            dailyProductions.length > 0 && quantities.highQualityQuantity && quantities.lowQualityQuantity
+            dailyProductions.length > 0 && quantities.highQualityQuantity!==undefined && quantities.lowQualityQuantity!==undefined
             ? <DailyProductionSearchView quantities={quantities} dailyProductions={dailyProductions} itemId={itemId}/>
             : null
           }
