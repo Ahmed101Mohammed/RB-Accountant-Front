@@ -43,7 +43,7 @@ const EmployeesPage = ()=>
 
   return(
     <>
-      <div className="sticky top-[0px]">
+      <div className="sticky top-[0px] z-10">
         <Header/>
         <ManageEmployeesForm legend={'إنشاء/تعديل موظف'} />
       </div>

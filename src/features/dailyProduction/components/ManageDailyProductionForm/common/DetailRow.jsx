@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteDetail, updateDetail } from "../../reducers/dailyProductionForm";
-import { generateTimeOptions } from "../../utils/generateTimeOptions";
+import { deleteDetail, updateDetail } from "../../../reducers/dailyProductionForm.js";
+import { generateTimeOptions } from "../../../utils/generateTimeOptions.js";
 import { TextInput } from "./TextInput.jsx";
 import { SelectInput } from "./SelectInput.jsx";
 import { NumberInput } from "./NumberInput.jsx";
 import { Trash2 } from "lucide-react";
-import { getPossibleMachines } from "../../../machines/services/machines.js";
-import { getPossibleEmployees } from "../../../../services/employees.js";
+import { getPossibleMachines } from "../../../../machines/services/machines.js";
+import { getPossibleEmployees } from "../../../../../services/employees.js";
 
 export // Detail Row Component
 const DetailRow = ({ detail, detailIndex, shiftIndex, itemIndex, shiftStart, shiftEnd }) => {
@@ -122,7 +122,7 @@ const DetailRow = ({ detail, detailIndex, shiftIndex, itemIndex, shiftStart, shi
       </td>
       <td className="p-2 border-b">
         <NumberInput
-          className="bg-red-100"
+          className="bg-red-300"
           value={detail.lowQualityQuantity}
           onChange={(value) => updateDetailField('lowQualityQuantity', value)}
           onFocus={emptyPosibleties}

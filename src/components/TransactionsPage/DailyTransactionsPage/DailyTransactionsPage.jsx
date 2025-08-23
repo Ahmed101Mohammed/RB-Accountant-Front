@@ -48,7 +48,7 @@ const DailyTransactionsPage = ()=>
   }
   return(
     <>
-      <div className="sticky top-[0px]">
+      <div className="sticky top-[0px] z-10">
         <Header/>
         <ManageTransactionsForm ref={formRef} legend={'إنشاء/تعديل معاملة'} />
       </div>

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { addDetail } from "../../reducers/dailyProductionForm";
+import { addDetail } from "../../../reducers/dailyProductionForm.js";
 import { DetailRow } from "./DetailRow.jsx";
 
 export const DetailsTable = ({ details = [], shiftIndex, itemIndex, shiftStart, shiftEnd }) => {

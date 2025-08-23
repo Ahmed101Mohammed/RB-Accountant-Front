@@ -1,8 +1,8 @@
 import React from "react";
 import { Cancel01Icon } from "hugeicons-react"
 import { useState } from "react"
-import { TextInput } from "../../dailyProduction/components/ManageDailyProductionForm/TextInput.jsx";
-import { SelectInput } from "../../dailyProduction/components/ManageDailyProductionForm/SelectInput.jsx";
+import { TextInput } from "../../dailyProduction/components/ManageDailyProductionForm/common/TextInput.jsx";
+import { SelectInput } from "../../dailyProduction/components/ManageDailyProductionForm/common/SelectInput.jsx";
 
 const NumberInput = ({ value, onChange, label, className = '', onFocus }) => (
   <div className={`space-y-2`}>

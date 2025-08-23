@@ -42,7 +42,7 @@ const AccountStatementPage = () =>
   //   : null;
   return (
     <>
-      <div className="sticky top-[0px]">
+      <div className="sticky top-[0px] z-10">
         <Header /*children={headerChildren}*//>
         <AccountStatementForm legend={'كشف معاملات حساب'}/>
       </div>

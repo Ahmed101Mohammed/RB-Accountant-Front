@@ -1,13 +1,11 @@
 import React from "react"
-import { useDispatch, useSelector } from "react-redux";
-import { setTransactionsFormAmountField, settransactionsFormCommentField, settransactionsFormCreditorIdField, settransactionsFormDateField, settransactionsFormDebtorIdField, setTransactionsFormTransactionId, toggleTransactionsFormState } from "../reducers/transactions";
 
 // TableEntity.jsx
-const TableEntity = ({ data, customTailwind, onClick, dataHeader, ref }) => {
+const TableEntity = ({ data, customTailwind, onClick, dataHeader, ref, className }) => {
   return (
-    <tr className={`border-b ${customTailwind}`} {...dataHeader} ref={ref}>
+    <tr className={`border-b ${customTailwind ? customTailwind : ''} ${className}`} {...dataHeader} ref={ref}>
       {data.map((item, index) => (
-        <td key={index} onClick={onClick} className="px-4 py-2 border">
+        <td key={index} onClick={onClick} className="px-4 py-2 border whitespace-nowrap">
           {item}
         </td>
       ))}

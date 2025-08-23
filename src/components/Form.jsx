@@ -66,7 +66,7 @@ const Form = ({ legend, submitHandler, children }) => {
     gridTemplateColumns: `repeat(${setButtons().length}, 1fr)`
   }
   return (
-    <div className="w-[100%] p-2 bg-gray-100 border border-gray-600" >
+    <div className="w-[100%] sticky p-2 bg-gray-100 border border-gray-600" >
       <div dir="rtl">
         <button onClick={()=> setVisibility(false)}><Cancel01Icon size={24}/></button>
       </div>

@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react"
 import { getPossibleItems } from "../../../items/services/items.js";
 import { Search } from "lucide-react";
-import { TextInput } from "./TextInput.jsx";
-import { DateInput } from "./DateInput.jsx";
-import { getItemProductionQuantitiesTotalForAPeriod, getItemStartAndEndProductionsDate } from "../../services/dailyProduction.js";
+import { TextInput } from "./common/TextInput.jsx";
+import { DateInput } from "./common/DateInput.jsx";
+import { getAllDailyProductionsForItemForPeriod, getItemProductionQuantitiesTotalForAPeriod, getItemStartAndEndProductionsDate } from "../../services/dailyProduction.js";
 import { useDispatch } from "react-redux";
 import { removeNotification, setErrorNotification } from "../../../../reducers/notification.js";
+import { DailyProductionSearchView } from "./common/DailyProductionSearchView.jsx";
 
 export const SearchDailyProductionForm = ()=>
 {
@@ -14,7 +15,7 @@ export const SearchDailyProductionForm = ()=>
   const [endPeriod, setEndPeriod] = useState('')
   const [posibleItems, setPosibleItems] = useState([]);
   const [quantities, setQuantities] = useState({})
-
+  const [dailyProductions, setDailyProductions] = useState([])
   const dispatch = useDispatch()
   
   const autoPeriodSetting = async(value)=>
@@ -66,7 +67,11 @@ export const SearchDailyProductionForm = ()=>
       setTimeout(()=> dispatch(removeNotification()), 5000)
       return;
     }
-
+    const responseDetailed = await getAllDailyProductionsForItemForPeriod(itemId, startPeriod, endPeriod);
+    if(responseDetailed.state)
+    {
+      setDailyProductions(responseDetailed.data)
+    }
     const {highQualityQuantity, lowQualityQuantity} = response.data[0];
     setQuantities({highQualityQuantity, lowQualityQuantity})
     focusOnFirstInput()
@@ -129,31 +134,12 @@ export const SearchDailyProductionForm = ()=>
                     بحث
                   </button>
             </div>
-            {
-              quantities.highQualityQuantity !== undefined && quantities.lowQualityQuantity !== undefined
-              ? (
-                <div className="flex gap-4">
-                  <div className="high flex-1 bg-white border-l-4 border-green-500 rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm">
-                    <p className="text-xl font-bold text-gray-800 mb-1">
-                      الإنتاج عالي الجودة
-                    </p>
-                    <p className="text-2xl font-extrabold text-green-600">
-                      {quantities.highQualityQuantity}
-                    </p>
-                  </div>
-                  <div className="low flex-1 bg-white border-l-4 border-red-500 rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm">
-                    <p className="text-xl font-bold text-gray-800 mb-1">
-                      الإنتاج ضعيف الجودة
-                    </p>
-                    <p className="text-2xl font-extrabold text-red-600">
-                      {quantities.lowQualityQuantity}
-                    </p>
-                  </div>
-                </div>
-              )
-              : null
-            }
           </form>
+          {
+            dailyProductions.length > 0 && quantities.highQualityQuantity && quantities.lowQualityQuantity
+            ? <DailyProductionSearchView quantities={quantities} dailyProductions={dailyProductions} itemId={itemId}/>
+            : null
+          }
         </div>
   )
 }

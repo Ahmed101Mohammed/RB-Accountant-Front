@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { addItem, updateItem, deleteItem } from "../../reducers/dailyProductionForm";
+import { addItem, updateItem, deleteItem } from "../../../reducers/dailyProductionForm.js";
 import { useDispatch } from "react-redux";
 import { Package, Plus, Trash2, User } from "lucide-react";
 import { TextInput } from "./TextInput.jsx";
 import { DetailsTable } from "./DetailsTable.jsx";
-import accountsServices from "../../../../services/accounts.js";
-import { getPossibleItems } from "../../../items/services/items.js";
+import accountsServices from "../../../../../services/accounts.js";
+import { getPossibleItems } from "../../../../items/services/items.js";
 
 export const ItemComponent = ({ item, itemIndex, shiftIndex, shiftStart, shiftEnd }) => {
   const dispatch = useDispatch();

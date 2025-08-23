@@ -1,5 +1,5 @@
 import React from "react";
-import Details from "../../../../components/Details.jsx";
+import Details from "../../../../../components/Details.jsx";
 
 export const TextInput = ({ value, onChange, label, icon: Icon, placeholder = '', className = '', listValues=[], onSelect, onFocus, inputRef }) => (
   <div className={`space-y-2 ${className}`}>
