@@ -52,7 +52,7 @@ export const MachinesPage = ()=>
 
   return(
     <>
-      <div className="sticky top-[0px]">
+      <div className="sticky top-[0px] z-10">
         <Header/>
         <ManageMachinesForm legend={'إنشاء/تعديل ماكينة'} />
       </div>

@@ -1,8 +1,8 @@
 import React from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { generateTimeOptions } from "../../utils/generateTimeOptions";
-import { updateShift, addItem, deleteShift } from "../../reducers/dailyProductionForm";
+import { generateTimeOptions } from "../../../utils/generateTimeOptions.js";
+import { updateShift, addItem, deleteShift } from "../../../reducers/dailyProductionForm.js";
 import { SelectInput } from "./SelectInput.jsx";
 import { Clock, Plus, Settings, Trash2 } from "lucide-react";
 import { ItemComponent } from "./ItemComponent.jsx";

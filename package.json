@@ -1,6 +1,6 @@
 {
   "name": "rb-accountant",
-  "version": "2.1.1",
+  "version": "2.2.1",
   "description": "Frontend part of rb-accountant descktop application",
   "main": "index.js",
   "scripts": {

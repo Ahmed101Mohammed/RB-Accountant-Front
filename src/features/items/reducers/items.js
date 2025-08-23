@@ -6,7 +6,7 @@ const fromHighToLowIdPrefix = (itemA, itemB) =>
   const prefixAInt = Number.parseInt(itemAParts[0]);
   const prefixBInt = Number.parseInt(itemBParts[0]);
   const postfixAInt = Number.parseInt(itemAParts[1]);
-  const postfixBInt = Number.parseInt(itemAParts[1]);
+  const postfixBInt = Number.parseInt(itemBParts[1]);
 
   const prefixAStr = itemAParts[0];
   const prefixBStr = itemBParts[0];

@@ -1,13 +1,12 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { addShift, reSetDailyProduction, setCreateMode, setDailyProductionId, setDate, setVisibility } from '../../reducers/dailyProductionForm.js';
-import { DateInput } from './DateInput.jsx';
-import { ShiftComponent } from './ShiftComponent.jsx';
+import { DateInput } from './common/DateInput.jsx';
+import { ShiftComponent } from './common/ShiftComponent.jsx';
 import { removeNotification, setErrorNotification, setSuccessNotification } from '../../../../reducers/notification.js';
-import { createDailyProductionRecord, deleteDailyProductionById, getDailyProductionById, updateDailyProductionWithId } from '../../services/dailyProduction.js';
+import { createDailyProductionRecord, getDailyProductionById, updateDailyProductionWithId } from '../../services/dailyProduction.js';
 import { addDailyProduction, removeDailyProduction } from '../../reducers/dailyProductions.js';
-import { useConfirm } from '../../../../customStates/useConfirm.js';
 import React, { useEffect } from 'react';
-import { Plus, Save, Undo2, X } from 'lucide-react';
+import { Plus, Save, Undo2} from 'lucide-react';
 
 export const RecordDailyProductionForm = ()=>
 {

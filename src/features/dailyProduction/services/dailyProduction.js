@@ -39,3 +39,9 @@ export const deleteDailyProductionById = async(dailyProductionId) =>
   const response = await window.apis.deleteDailyProductionById(dailyProductionId);
   return response;
 }
+
+export const getAllDailyProductionsForItemForPeriod = async(itemId, startId, endPeriod) =>
+{
+  const response = await window.apis.getAllDailyProductionsForItemForPeriod(itemId, startId, endPeriod);
+  return response;
+}
